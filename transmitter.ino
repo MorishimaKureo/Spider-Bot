@@ -8,17 +8,17 @@
 // MASUKKAN MAC ADDRESS NODEMCU ROBOT KAMU DI SINI
 uint8_t broadcastAddress[] = {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC}; 
 
-// Definisi Pin Tombol di NodeMCU Remote (Silakan sesuaikan dengan seleramu)
-#define PIN_UP    D0
-#define PIN_DOWN  D3
-#define PIN_LEFT  D4
-#define PIN_RIGHT D5
-#define PIN_Q     D6
-#define PIN_E     D7
-#define PIN_A     D8
-#define PIN_B     D1
-#define PIN_C     D2
-#define PIN_D     SD3 // Atau pin digital lain yang tersedia
+// Menggunakan nomor GPIO langsung agar universal di semua board ESP8266
+#define PIN_UP    16 // Sama dengan D0 di NodeMCU
+#define PIN_DOWN   0 // Sama dengan D3 di NodeMCU
+#define PIN_LEFT   2 // Sama dengan D4 di NodeMCU
+#define PIN_RIGHT 14 // Sama dengan D5 di NodeMCU
+#define PIN_Q     12 // Sama dengan D6 di NodeMCU
+#define PIN_E     13 // Sama dengan D7 di NodeMCU
+#define PIN_A     15 // Sama dengan D8 di NodeMCU
+#define PIN_B      5 // Sama dengan D1 di NodeMCU
+#define PIN_C      4 // Sama dengan D2 di NodeMCU
+#define PIN_D      3 // Menggunakan GPIO 3 (Pin RX) untuk tombol Stand
 
 struct DataPaket {
   char perintah;
@@ -28,7 +28,7 @@ DataPaket dataKirim;
 char perintahTerakhir = 'S'; // 'S' artinya Stop / Diam
 
 void OnDataSent(uint8_t *mac_addr, uint8_t status) {
-  // Callback status pengiriman jika diperlukan untuk debugging
+  // Callback status pengiriman
 }
 
 void setup() {
@@ -68,7 +68,7 @@ void loop() {
   if (digitalRead(PIN_UP) == LOW) {
     perintahSekarang = 'U'; // Maju
   } else if (digitalRead(PIN_DOWN) == LOW) {
-    perintahSekarang = 'N'; // Mundur (N dari dowN)
+    perintahSekarang = 'N'; // Mundur
   } else if (digitalRead(PIN_LEFT) == LOW) {
     perintahSekarang = 'L'; // Strafe Kiri
   } else if (digitalRead(PIN_RIGHT) == LOW) {
@@ -84,10 +84,10 @@ void loop() {
   } else if (digitalRead(PIN_C) == LOW) {
     perintahSekarang = 'C'; // Stretch
   } else if (digitalRead(PIN_D) == LOW) {
-    perintahSekarang = 'D'; // Stand (Sama dengan UP di kode lama)
+    perintahSekarang = 'D'; // Stand
   }
 
-  // Kirim data hanya jika ada perubahan status tombol untuk menghemat bandwidth
+  // Kirim data hanya jika ada perubahan status tombol
   if (perintahSekarang != perintahTerakhir) {
     perintahTerakhir = perintahSekarang;
     dataKirim.perintah = perintahTerakhir;
@@ -97,5 +97,5 @@ void loop() {
     Serial.println(perintahTerakhir);
   }
   
-  delay(30); // Delay kecil untuk stabilitas reading pembacaan tombol
+  delay(30); 
 }
